@@ -63,7 +63,7 @@ resource "aws_subnet" "aislada-B" {
 }
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
- 
+
   tags = {
     Name = "p3-igw"
   }
@@ -72,7 +72,7 @@ resource "aws_route_table" "publica" {
   vpc_id = aws_vpc.main.id
 
   route {
-    
+
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.gw.id
 
@@ -89,6 +89,23 @@ resource "aws_route_table_association" "public-A" {
 resource "aws_route_table_association" "public-B" {
   subnet_id      = aws_subnet.publica-B.id
   route_table_id = aws_route_table.publica.id
+
 }
 
+resource "aws_eip" "nominas" {
+
+  domain = "vpc"
+}
+
+
+resource "aws_nat_gateway" "nominas" {
+  allocation_id = aws_eip.nominas.id
+  subnet_id     = aws_subnet.publica-A.id
+
+  tags = {
+    Name = "nat_gw_nominas"
+  }
+
+  depends_on = [aws_internet_gateway.gw]
+}
 
