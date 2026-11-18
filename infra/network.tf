@@ -109,3 +109,29 @@ resource "aws_nat_gateway" "nominas" {
   depends_on = [aws_internet_gateway.gw]
 }
 
+
+
+resource "aws_route_table" "privada" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nominas.id
+  }
+
+  
+  tags = {
+    Name = "p3-privada-rt"
+  }
+}
+
+resource "aws_route_table_association" "privada-A" {
+  subnet_id      = aws_subnet.privada-A.id
+  route_table_id = aws_route_table.privada.id
+}
+
+resource "aws_route_table_association" "privada-B" {
+  subnet_id      = aws_subnet.privada-B.id
+  route_table_id = aws_route_table.privada.id
+}
+
